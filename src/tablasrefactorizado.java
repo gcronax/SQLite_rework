@@ -24,6 +24,7 @@ public class tablasrefactorizado {
     private static JFrame frameActualizar = null;
     public static Object[] cambiante;
     private static final String URL = "jdbc:sqlite:skateshop.db";
+    private static JPanel panelconsulta;
 
 
     public static Connection connect() {
@@ -55,24 +56,15 @@ public class tablasrefactorizado {
             columnTypes = getColumnTypes();
 
             frameSubMenu = new JFrame("Gestion de "+tableName);
-            frameSubMenu.setSize(600, 100);
+            frameSubMenu.setSize(800, 500);
             Toolkit mipantalla= Toolkit.getDefaultToolkit();
             Dimension dimension = mipantalla.getScreenSize();
             frameSubMenu.setLocation(dimension.width/4, dimension.height/4);
             JPanel panel = new JPanel();
             panel.setLayout(new GridLayout(1, 1));
-            JButton btnconsultar = new JButton("consultar");
-            btnconsultar.addActionListener(e -> {
-                queryData(0,true);
-            });
-            btnconsultar.setFont(new Font("Arial", Font.BOLD, 18));
-            btnconsultar.setBackground(Color.lightGray);
-            panel.add(btnconsultar);
-
             JButton btninsertar = new JButton("insertar");
             btninsertar.addActionListener(e -> {
                 insertData();
-                frameSubMenu.setVisible(false);
             });
             btninsertar.setFont(new Font("Arial", Font.BOLD, 18));
             btninsertar.setBackground(Color.lightGray);
@@ -81,7 +73,6 @@ public class tablasrefactorizado {
             JButton btneliminar = new JButton("eliminar");
             btneliminar.addActionListener(e -> {
                 deleteData();
-                frameSubMenu.setVisible(false);
             });
             btneliminar.setFont(new Font("Arial", Font.BOLD, 18));
             btneliminar.setBackground(Color.lightGray);
@@ -90,7 +81,6 @@ public class tablasrefactorizado {
             JButton btnactualizar = new JButton("actualizar");
             btnactualizar.addActionListener(e -> {
                 updateData();
-                frameSubMenu.setVisible(false);
             });
             btnactualizar.setFont(new Font("Arial", Font.BOLD, 18));
             btnactualizar.setBackground(Color.lightGray);
@@ -108,11 +98,13 @@ public class tablasrefactorizado {
             btnsalir.setFont(new Font("Arial", Font.BOLD, 18));
             btnsalir.setBackground(Color.lightGray);
             panel.add(btnsalir);
+            frameSubMenu.setLayout(new BorderLayout());
 
-
-            frameSubMenu.add(panel);
+            frameSubMenu.add(panel, BorderLayout.NORTH);
             frameSubMenu.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
             frameSubMenu.setVisible(true);
+            queryData(0,true);
+
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -124,6 +116,11 @@ public class tablasrefactorizado {
         Statement stmt = null;
         ResultSet rs = null;
         Connection conn = null;
+        if (panelconsulta != null) {
+            frameSubMenu.remove(panelconsulta);
+        }
+        panelconsulta = new JPanel(new BorderLayout());
+
 
         try {
             conn = connect();
@@ -148,31 +145,19 @@ public class tablasrefactorizado {
                 model.addRow(row);
             }
 
-            if (frameConsulta == null) {
-                frameConsulta = new JFrame("Listado de " + tableName);
-                frameConsulta.setSize(800, 400);
-                JScrollPane scrollPane = new JScrollPane(table);
-                frameConsulta.add(scrollPane);
-                frameConsulta.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            } else {
-                frameConsulta.getContentPane().removeAll();
-                frameConsulta.setTitle("Listado de " + tableName);
-                JScrollPane scrollPane = new JScrollPane(table);
-                frameConsulta.add(scrollPane);
-                frameConsulta.revalidate();
-                frameConsulta.repaint();
-            }
-            Toolkit mipantalla= Toolkit.getDefaultToolkit();
-            Dimension dimension = mipantalla.getScreenSize();
-            frameConsulta.setLocation(dimension.width/4, dimension.height/2);
-            frameConsulta.setVisible(true);
 
+            JScrollPane scrollPane = new JScrollPane(table);
+            panelconsulta.add(scrollPane, BorderLayout.CENTER);
+            frameSubMenu.add(panelconsulta, BorderLayout.CENTER);
+            frameSubMenu.revalidate();
+            frameSubMenu.repaint();
 
             JTableHeader tableHeader = table.getTableHeader();
             tableHeader.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     click[0] = !click[0];
+                    //System.out.println(tableHeader.columnAtPoint(e.getPoint()) +" " +click[0]);
                     queryData(tableHeader.columnAtPoint(e.getPoint()), click[0]);
                 }
             });
@@ -440,26 +425,21 @@ public class tablasrefactorizado {
 
     public static void updateData() {
         //dejar solo id y generar dinamicamente botones por nombre campo a actualizar que contengan la llamada en si a insertar donde su text field sea local y id global
-        frameActualizar = new JFrame("Actualizar "+tableName);
-        frameActualizar.setSize(300, 500);
-        Toolkit mipantalla= Toolkit.getDefaultToolkit();
-        Dimension dimension = mipantalla.getScreenSize();
-        frameActualizar.setLocation(dimension.width/20, dimension.height/3);
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        JPanel panelactualizar= new JPanel();//new BorderLayout()
+        panelactualizar.setLayout(new BoxLayout(panelactualizar, BoxLayout.Y_AXIS));
         JTextField textFieldid = new JTextField(20);
-        textFieldid.setMaximumSize(new Dimension(400,20));
+        textFieldid.setMaximumSize(new Dimension(300,20));
         ArrayList<JTextField> textFields=new ArrayList<>();
         JLabel labelid = new JLabel("Ingrese el ID del " + entityName);
-        panel.add(labelid);
-        panel.add(textFieldid);
+        panelactualizar.add(labelid);
+        panelactualizar.add(textFieldid);
         for (int i = 1; i < headers.length; i++) {
             JTextField textField = new JTextField(20);
-            textField.setMaximumSize(new Dimension(400,20));
+            textField.setMaximumSize(new Dimension(300,20));
             textFields.add(textField);
             JLabel label = new JLabel("Ingrese " + headers[i]);
-            panel.add(label);
-            panel.add(textField);
+            panelactualizar.add(label);
+            panelactualizar.add(textField);
         }
 
         if (cambiante!=null){
@@ -488,8 +468,24 @@ public class tablasrefactorizado {
         timer.start();
 
 
-        panel.add(Box.createVerticalStrut(10)); // Espacio entre componentes
+        panelactualizar.add(Box.createVerticalStrut(10)); // Espacio entre componentes
         JButton btnactualizar = new JButton("actualizar");
+        panelactualizar.add(btnactualizar);
+
+        JButton btncancelar = new JButton("cancelar");
+
+        panelactualizar.add(btncancelar);
+        JScrollPane scrollPane = new JScrollPane(panelactualizar);
+        scrollPane.setPreferredSize(new Dimension(180, frameSubMenu.getHeight()));
+        frameSubMenu.add(scrollPane, BorderLayout.EAST);
+        frameSubMenu.revalidate();
+        frameSubMenu.repaint();
+        btncancelar.addActionListener(e -> {
+            frameSubMenu.remove(scrollPane);
+            frameSubMenu.revalidate();
+            frameSubMenu.repaint();
+            timer.stop();
+        });
         btnactualizar.addActionListener(e -> {
             if (mostrarDialogo(frameActualizar)){
                 try{
@@ -505,28 +501,14 @@ public class tablasrefactorizado {
                 }catch (Exception es) {
                     System.out.println("Error al actualizar el " + entityName + ": " + es.getMessage());
                 }
-                frameActualizar.dispose();
-                frameSubMenu.setVisible(true);
+                frameSubMenu.remove(scrollPane);
+                frameSubMenu.revalidate();
+                frameSubMenu.repaint();
                 queryData(0,true);
             }
-
-
         });
-        panel.add(btnactualizar);
 
-        JButton btncancelar = new JButton("cancelar");
-        btncancelar.addActionListener(e -> {
-            frameSubMenu.setVisible(true);
-            frameActualizar.dispose();
-            timer.stop();
-        });
-        panel.add(btncancelar);
-        //panel.setLayout( new BoxLayout(panel,BoxLayout.Y_AXIS));
-        frameActualizar.add(panel);
-        JScrollPane scrollPane = new JScrollPane(panel);
-        frameActualizar.add(scrollPane);
-        frameActualizar.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frameActualizar.setVisible(true);
+
     }
 
     private static void actualizar(int selection, String newValue, int id) {

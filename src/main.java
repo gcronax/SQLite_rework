@@ -6,7 +6,6 @@ public class main {
     static JFrame frameMenu = null;
 
     public static void main(String[] args) {
-        Scanner scan= new Scanner(System.in);
         frameMenu = new JFrame("menu");
         frameMenu.setSize(600, 100);
 
