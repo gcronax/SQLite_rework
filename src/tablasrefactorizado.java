@@ -16,10 +16,6 @@ public class tablasrefactorizado {
     public static String[] headers;
     public static int[] columnTypes;
     public static JFrame frameSubMenu = new JFrame();
-
-    private static JFrame frameInsertar = null;
-    private static JFrame frameEliminar = null;
-    private static JFrame frameActualizar = null;
     public static Object[] cambiante;
     private static final String URL = "jdbc:sqlite:skateshop.db";
     private static JPanel panelconsulta;
@@ -135,7 +131,6 @@ public class tablasrefactorizado {
         }
         panelconsulta = new JPanel(new BorderLayout());
 
-
         try {
             conn = connect();
             stmt = conn.createStatement();
@@ -144,7 +139,15 @@ public class tablasrefactorizado {
             int columnCount = metaData.getColumnCount();
             String[] columns = new String[columnCount];
             for (int i = 1; i <= columnCount; i++) {
-                columns[i - 1] = metaData.getColumnName(i);
+                String recaulcula=metaData.getColumnName(i);
+                if (i-1==x){
+                    if (bool){
+                        recaulcula=recaulcula+" ↓";
+                    }else{
+                        recaulcula=recaulcula+" ↑";
+                    }
+                }
+                columns[i - 1] = recaulcula;
             }
 
             DefaultTableModel model = new DefaultTableModel(columns, 0);
@@ -258,7 +261,7 @@ public class tablasrefactorizado {
                 fieldValues[i++] =text.getText();
             }
 
-            if (mostrarDialogo(frameInsertar)){
+            if (mostrarDialogo()){
                 try{
                     insertar(finalColumns, finalConn, fieldValues, finalTypes);
                 }catch (Exception es) {
@@ -377,7 +380,7 @@ public class tablasrefactorizado {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (mostrarDialogo(frameEliminar)){
+                if (mostrarDialogo()){
                     try{
                         eliminar(Integer.parseInt(textField.getText()));
                     }catch (Exception es) {
@@ -503,7 +506,7 @@ public class tablasrefactorizado {
             timer.stop();
         });
         btnactualizar.addActionListener(e -> {
-            if (mostrarDialogo(frameActualizar)){
+            if (mostrarDialogo()){
                 try{
                     int i=1;
                     for (JTextField text:textFields){
@@ -572,9 +575,9 @@ public class tablasrefactorizado {
         }
     }
 
-    private static boolean mostrarDialogo(JFrame framselect) {
+    private static boolean mostrarDialogo() {
         final boolean[] select = {false};
-        JDialog dialogo = new JDialog(framselect, "Warning", true);
+        JDialog dialogo = new JDialog(frameSubMenu, "Warning", true);
         dialogo.setSize(180, 100); // Tamaño del diálogo.
         dialogo.setLayout(new FlowLayout());
         JLabel etiqueta = new JLabel("Esta usted seguro?");
@@ -598,7 +601,7 @@ public class tablasrefactorizado {
         dialogo.add(etiqueta);
         dialogo.add(btnAceptar);
         dialogo.add(btnCerrar);
-        dialogo.setLocationRelativeTo(framselect);
+        dialogo.setLocationRelativeTo(frameSubMenu);
         dialogo.setVisible(true);
         return select[0];
     }
