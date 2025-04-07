@@ -1,9 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.Scanner;
 
 public class main {
-    public static JPanel panel = new JPanel();
+    public static JPanel panelMenu = new JPanel();
 
     public static void main(String[] args) {
         tablasrefactorizado.frameSubMenu.setTitle("Menu");
@@ -12,41 +11,52 @@ public class main {
         Dimension dimension = mipantalla.getScreenSize();
         tablasrefactorizado.frameSubMenu.setLocation(dimension.width/4, dimension.height/4);
 
-        panel.setLayout(new GridLayout(1, 1));
-        JButton btnpisos = new JButton("skateboards");
-        btnpisos.addActionListener(e -> {
+        panelMenu.setLayout(new GridLayout(1, 1));
+        JButton btnskate = new JButton("skateboards");
+        btnskate.addActionListener(e -> {
             tablasrefactorizado.menuTablas("skateboard","skateboards");
-            tablasrefactorizado.frameSubMenu.setVisible(false);
-        });
-        btnpisos.setFont(new Font("Arial", Font.BOLD, 18));
-        btnpisos.setBackground(Color.lightGray);
-        panel.add(btnpisos);
+            panelMenu.setVisible(false);
+            tablasrefactorizado.frameSubMenu.revalidate();
+            tablasrefactorizado.frameSubMenu.repaint();        });
+        btnskate.setFont(new Font("Arial", Font.BOLD, 18));
+        btnskate.setBackground(Color.lightGray);
+        panelMenu.add(btnskate);
 
-        JButton btnpropietarios = new JButton("ruedas");
-        btnpropietarios.addActionListener(e -> {
+        JButton btnruedas = new JButton("ruedas");
+        btnruedas.addActionListener(e -> {
             tablasrefactorizado.menuTablas("rueda","ruedas");
-            tablasrefactorizado.frameSubMenu.setVisible(false);
-        });
-        btnpropietarios.setFont(new Font("Arial", Font.BOLD, 18));
-        btnpropietarios.setBackground(Color.lightGray);
-        panel.add(btnpropietarios);
+            panelMenu.setVisible(false);
+            tablasrefactorizado.frameSubMenu.revalidate();
+            tablasrefactorizado.frameSubMenu.repaint();        });
+        btnruedas.setFont(new Font("Arial", Font.BOLD, 18));
+        btnruedas.setBackground(Color.lightGray);
+        panelMenu.add(btnruedas);
 
-        JButton btninquilinos = new JButton("tablas");
-        btninquilinos.addActionListener(e -> {
+        JButton btntablas = new JButton("tablas");
+        btntablas.addActionListener(e -> {
             tablasrefactorizado.menuTablas("tabla","tablas");
-            panel.setVisible(false);
+            panelMenu.setVisible(false);
             tablasrefactorizado.frameSubMenu.revalidate();
             tablasrefactorizado.frameSubMenu.repaint();
         });
-        btninquilinos.setFont(new Font("Arial", Font.BOLD, 18));
-        btninquilinos.setBackground(Color.lightGray);
-        panel.add(btninquilinos);
+        btntablas.setFont(new Font("Arial", Font.BOLD, 18));
+        btntablas.setBackground(Color.lightGray);
+        panelMenu.add(btntablas);
+
+        JButton btnsalir = new JButton("salir");
+        btnsalir.addActionListener(e -> {
+            tablasrefactorizado.frameSubMenu.dispose();
+
+        });
+        btnsalir.setFont(new Font("Arial", Font.BOLD, 18));
+        btnsalir.setBackground(Color.lightGray);
+        panelMenu.add(btnsalir);
 
 
         tablasrefactorizado.frameSubMenu.setLayout(new BorderLayout());
 
-        tablasrefactorizado.frameSubMenu.add(panel, BorderLayout.NORTH);
-        tablasrefactorizado.frameSubMenu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        tablasrefactorizado.frameSubMenu.add(panelMenu, BorderLayout.NORTH);
+        tablasrefactorizado.frameSubMenu.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         tablasrefactorizado.frameSubMenu.setVisible(true);
 

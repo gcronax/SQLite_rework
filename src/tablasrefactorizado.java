@@ -8,9 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
-import java.util.Scanner;
 
 public class tablasrefactorizado {
     public static String entityName;
@@ -66,6 +64,9 @@ public class tablasrefactorizado {
             JButton btninsertar = new JButton("insertar");
             btninsertar.addActionListener(e -> {
                 insertData();
+                panelSubmenu.setVisible(false);
+                frameSubMenu.revalidate();
+                frameSubMenu.repaint();
             });
             btninsertar.setFont(new Font("Arial", Font.BOLD, 18));
             btninsertar.setBackground(Color.lightGray);
@@ -74,6 +75,9 @@ public class tablasrefactorizado {
             JButton btneliminar = new JButton("eliminar");
             btneliminar.addActionListener(e -> {
                 deleteData();
+                panelSubmenu.setVisible(false);
+                frameSubMenu.revalidate();
+                frameSubMenu.repaint();
             });
             btneliminar.setFont(new Font("Arial", Font.BOLD, 18));
             btneliminar.setBackground(Color.lightGray);
@@ -102,7 +106,8 @@ public class tablasrefactorizado {
                 }
                 frameSubMenu.remove(panelconsulta);
                 frameSubMenu.remove(panelSubmenu);
-                main.panel.setVisible(true);
+                frameSubMenu.setTitle("Menu");
+                main.panelMenu.setVisible(true);
                 frameSubMenu.revalidate();
                 frameSubMenu.repaint();
             });
@@ -153,7 +158,7 @@ public class tablasrefactorizado {
                 }
                 model.addRow(row);
             }
-
+            table.getTableHeader().setReorderingAllowed(false);
 
             JScrollPane scrollPane = new JScrollPane(table);
             panelconsulta.add(scrollPane, BorderLayout.CENTER);
@@ -170,12 +175,12 @@ public class tablasrefactorizado {
                     queryData(tableHeader.columnAtPoint(e.getPoint()), click[0]);
                 }
             });
-            if (cambiante==null){
-                cambiante=new Object[columnCount];
-                for (int i=0; i<columnCount;i++){
-                    cambiante[i]=table.getValueAt(0, i);
-                }
-            }
+//            if (cambiante==null){
+//                cambiante=new Object[columnCount];
+//                for (int i=0; i<columnCount;i++){
+//                    cambiante[i]=table.getValueAt(0, i);
+//                }
+//            }
             table.getSelectionModel().addListSelectionListener(e ->{
                 cambiante=new Object[columnCount];
                 for (int i=0; i<columnCount;i++){
@@ -227,25 +232,18 @@ public class tablasrefactorizado {
                 System.out.println(ex.getMessage());
             }
         }
-        Scanner scanner = new Scanner(System.in);
         String[] fieldValues = new String[columns.length];
-
-
-        frameInsertar = new JFrame("Añadir "+tableName);
-        frameInsertar.setSize(300, 600);
-        Toolkit mipantalla= Toolkit.getDefaultToolkit();
-        Dimension dimension = mipantalla.getScreenSize();
-        frameInsertar.setLocation(dimension.width/20, dimension.height/3);
-        JPanel panel = new JPanel();
-
+        panelaDerecho =new JPanel();
+        panelaDerecho.setLayout(new BoxLayout(panelaDerecho, BoxLayout.Y_AXIS));
         ArrayList<JTextField> textFields=new ArrayList<>();
 
         for (int i = 1; i < columns.length; i++) {
             JTextField textField = new JTextField(20);
+            textField.setMaximumSize(new Dimension(300,20));
             textFields.add(textField);
             JLabel label = new JLabel("Ingrese " + columns[i]);
-            panel.add(label);
-            panel.add(textField);
+            panelaDerecho.add(label);
+            panelaDerecho.add(textField);
         }
 
         String[] finalColumns = columns;
@@ -266,24 +264,29 @@ public class tablasrefactorizado {
                 }catch (Exception es) {
                     System.out.println("Error al insertar " + entityName + ": " + es.getMessage());
                 }
-                frameInsertar.dispose();
-                frameSubMenu.setVisible(true);
+                frameSubMenu.remove(panelaDerecho);
+                panelSubmenu.setVisible(true);
+                frameSubMenu.revalidate();
+                frameSubMenu.repaint();
                 queryData(0,true);
             }
 
         });
-        panel.add(btninsertar);
+        panelaDerecho.add(Box.createVerticalStrut(10));
+
+        panelaDerecho.add(btninsertar);
         JButton btncancelar = new JButton("cancelar");
         btncancelar.addActionListener(e -> {
-            frameSubMenu.setVisible(true);
-            frameInsertar.dispose();
+            frameSubMenu.remove(panelaDerecho);
+            panelSubmenu.setVisible(true);
+            frameSubMenu.revalidate();
+            frameSubMenu.repaint();
         });
-        panel.add(btncancelar);
-
-        frameInsertar.add(panel);
-        frameInsertar.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frameInsertar.setVisible(true);
-
+        panelaDerecho.add(btncancelar);
+        panelaDerecho.setPreferredSize(new Dimension(180, frameSubMenu.getHeight()));
+        frameSubMenu.add(panelaDerecho, BorderLayout.EAST);
+        frameSubMenu.revalidate();
+        frameSubMenu.repaint();
 
     }
 
@@ -345,15 +348,13 @@ public class tablasrefactorizado {
 
     public static void deleteData() {
 
-        frameEliminar = new JFrame("Ingrese el ID de " + entityName + " que desea eliminar");
-        frameEliminar.setSize(400, 100);
-        Toolkit mipantalla= Toolkit.getDefaultToolkit();
-        Dimension dimension = mipantalla.getScreenSize();
-        frameEliminar.setLocation(dimension.width/4, dimension.height/3);
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+
+        panelaDerecho =new JPanel();
+        panelaDerecho.setLayout(new BoxLayout(panelaDerecho, BoxLayout.Y_AXIS));
+        JLabel labelid = new JLabel("Ingrese ID a eliminar ");
+        panelaDerecho.add(labelid);
         JTextField textField = new JTextField(20);
-        textField.setMaximumSize(new Dimension(400,30));// Campo de texto
+        textField.setMaximumSize(new Dimension(400,20));
         if (cambiante!=null){
             textField.setText(String.valueOf(cambiante[0]));
 
@@ -372,7 +373,6 @@ public class tablasrefactorizado {
             }
         });
         timer.start();
-
         JButton button = new JButton("eliminar id");
         button.addActionListener(new ActionListener() {
             @Override
@@ -383,25 +383,31 @@ public class tablasrefactorizado {
                     }catch (Exception es) {
                         System.out.println("Error al eliminar el " + entityName + ": " + es.getMessage());
                     }
-                    frameEliminar.dispose();
-                    frameSubMenu.setVisible(true);
+                    frameSubMenu.remove(panelaDerecho);
+                    panelSubmenu.setVisible(true);
+                    frameSubMenu.revalidate();
+                    frameSubMenu.repaint();
                     queryData(0,true);
                 }
             }
         });
-        panel.add(textField);
-        panel.add(button);
+        panelaDerecho.add(textField);
+        panelaDerecho.add(Box.createVerticalStrut(10));
+
+        panelaDerecho.add(button);
 
         JButton btncancelar = new JButton("cancelar");
         btncancelar.addActionListener(e -> {
-            frameSubMenu.setVisible(true);
-            frameEliminar.dispose();
+            frameSubMenu.remove(panelaDerecho);
+            panelSubmenu.setVisible(true);
+            frameSubMenu.revalidate();
+            frameSubMenu.repaint();
         });
-        panel.add(btncancelar);
-
-        frameEliminar.add(panel);
-        frameEliminar.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        frameEliminar.setVisible(true);
+        panelaDerecho.add(btncancelar);
+        panelaDerecho.setPreferredSize(new Dimension(180, frameSubMenu.getHeight()));
+        frameSubMenu.add(panelaDerecho, BorderLayout.EAST);
+        frameSubMenu.revalidate();
+        frameSubMenu.repaint();
 
 
     }
@@ -439,7 +445,7 @@ public class tablasrefactorizado {
         JTextField textFieldid = new JTextField(20);
         textFieldid.setMaximumSize(new Dimension(300,20));
         ArrayList<JTextField> textFields=new ArrayList<>();
-        JLabel labelid = new JLabel("Ingrese el ID del " + entityName);
+        JLabel labelid = new JLabel("Ingrese ID");
         panelaDerecho.add(labelid);
         panelaDerecho.add(textFieldid);
         for (int i = 1; i < headers.length; i++) {
