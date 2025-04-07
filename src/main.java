@@ -3,22 +3,20 @@ import java.awt.*;
 import java.util.Scanner;
 
 public class main {
-    static JFrame frameMenu = null;
+    public static JPanel panel = new JPanel();
 
     public static void main(String[] args) {
-        frameMenu = new JFrame("menu");
-        frameMenu.setSize(600, 100);
-
+        tablasrefactorizado.frameSubMenu.setTitle("Menu");
+        tablasrefactorizado.frameSubMenu.setSize(800, 500);
         Toolkit mipantalla= Toolkit.getDefaultToolkit();
         Dimension dimension = mipantalla.getScreenSize();
-        frameMenu.setLocation(dimension.width/4, dimension.height/4);
+        tablasrefactorizado.frameSubMenu.setLocation(dimension.width/4, dimension.height/4);
 
-        JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(1, 1));
         JButton btnpisos = new JButton("skateboards");
         btnpisos.addActionListener(e -> {
             tablasrefactorizado.menuTablas("skateboard","skateboards");
-            frameMenu.setVisible(false);
+            tablasrefactorizado.frameSubMenu.setVisible(false);
         });
         btnpisos.setFont(new Font("Arial", Font.BOLD, 18));
         btnpisos.setBackground(Color.lightGray);
@@ -27,7 +25,7 @@ public class main {
         JButton btnpropietarios = new JButton("ruedas");
         btnpropietarios.addActionListener(e -> {
             tablasrefactorizado.menuTablas("rueda","ruedas");
-            frameMenu.setVisible(false);
+            tablasrefactorizado.frameSubMenu.setVisible(false);
         });
         btnpropietarios.setFont(new Font("Arial", Font.BOLD, 18));
         btnpropietarios.setBackground(Color.lightGray);
@@ -36,16 +34,21 @@ public class main {
         JButton btninquilinos = new JButton("tablas");
         btninquilinos.addActionListener(e -> {
             tablasrefactorizado.menuTablas("tabla","tablas");
-            frameMenu.setVisible(false);
+            panel.setVisible(false);
+            tablasrefactorizado.frameSubMenu.revalidate();
+            tablasrefactorizado.frameSubMenu.repaint();
         });
         btninquilinos.setFont(new Font("Arial", Font.BOLD, 18));
         btninquilinos.setBackground(Color.lightGray);
         panel.add(btninquilinos);
 
 
-        frameMenu.add(panel);
-        frameMenu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frameMenu.setVisible(true);
+        tablasrefactorizado.frameSubMenu.setLayout(new BorderLayout());
+
+        tablasrefactorizado.frameSubMenu.add(panel, BorderLayout.NORTH);
+        tablasrefactorizado.frameSubMenu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        tablasrefactorizado.frameSubMenu.setVisible(true);
 
 
 
