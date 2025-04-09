@@ -365,6 +365,7 @@ public class tablasrefactorizado {
                 System.out.println(entityName + " insertado exitosamente.");
             }
         } catch (Exception e) {
+            errorMessage("Error al insertar");
             System.out.println("Error al insertar " + entityName + ": " + e.getMessage());
         } finally {
             try {
@@ -409,7 +410,7 @@ public class tablasrefactorizado {
             public void actionPerformed(ActionEvent e) {
                 if (mostrarDialogo()){
                     try{
-                        eliminar(Integer.parseInt(textField.getText()));
+                        eliminar(textField.getText());
                     }catch (Exception es) {
                         System.out.println("Error al eliminar el " + entityName + ": " + es.getMessage());
                     }
@@ -442,7 +443,7 @@ public class tablasrefactorizado {
 
     }
 
-    private static void eliminar(int id) {
+    private static void eliminar(Object id) {
         PreparedStatement pstmt = null;
         Connection conn = null;
 
@@ -450,14 +451,16 @@ public class tablasrefactorizado {
             conn = connect();
             String sql = "DELETE FROM " + tableName + " WHERE " + headers[0] + " = ?";
             pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, id);
+            pstmt.setObject(1, id);
             int rowsDeleted = pstmt.executeUpdate();
             if (rowsDeleted > 0) {
                 System.out.println(entityName + " eliminado exitosamente.");
             } else {
+                errorMessage("No se encontró el ID proporcionado.");
                 System.out.println("No se encontró una " + entityName + " con el ID proporcionado.");
             }
         } catch (Exception e) {
+            errorMessage("Error al eliminar el id");
             System.out.println("Error al eliminar el " + entityName + ": " + e.getMessage());
         } finally {
             try {
@@ -636,6 +639,25 @@ public class tablasrefactorizado {
         dialogo.setLocationRelativeTo(frameSubMenu);
         dialogo.setVisible(true);
         return select[0];
+    }
+    private static void errorMessage(String message) {
+        JDialog dialogo = new JDialog(frameSubMenu, "Error", true);
+        dialogo.setSize(180, 100); // Tamaño del diálogo.
+        dialogo.setLayout(new FlowLayout());
+        JLabel etiqueta = new JLabel(message);
+
+        JButton btnAceptar = new JButton("Aceptar");
+        btnAceptar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialogo.dispose(); // cierra el JDialog.
+            }
+        });
+        dialogo.add(etiqueta);
+        dialogo.add(btnAceptar);
+
+        dialogo.setLocationRelativeTo(frameSubMenu);
+        dialogo.setVisible(true);
     }
 
     public static String[] getHeaders() {
