@@ -8,6 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class tablasrefactorizado {
@@ -17,12 +18,13 @@ public class tablasrefactorizado {
     public static int[] columnTypes;
     public static JFrame frameSubMenu = new JFrame();
     public static Object[] cambiante;
-    private static final String URL = "jdbc:sqlite:skateshop.db";
+    public static String BDS;
     private static JPanel panelconsulta;
     public static JPanel panelaDerecho;
     public static JPanel panelSubmenu;//new BorderLayout()
 
     public static Connection connect() {
+        String URL = "jdbc:sqlite:"+BDS+".db";
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(URL);
@@ -239,6 +241,13 @@ public class tablasrefactorizado {
         panelaDerecho =new JPanel();
         panelaDerecho.setLayout(new BoxLayout(panelaDerecho, BoxLayout.Y_AXIS));
         ArrayList<JTextField> textFields=new ArrayList<>();
+        JTextField textFielid = new JTextField(20);
+        if (notAutiIncrement()){
+            textFielid.setMaximumSize(new Dimension(300,20));
+            JLabel label = new JLabel("Ingrese " + columns[0]);
+            panelaDerecho.add(label);
+            panelaDerecho.add(textFielid);
+        }
 
         for (int i = 1; i < columns.length; i++) {
             JTextField textField = new JTextField(20);
@@ -255,6 +264,9 @@ public class tablasrefactorizado {
 
         JButton btninsertar = new JButton("insertar");
         btninsertar.addActionListener(e -> {
+            if(notAutiIncrement()){
+                fieldValues[0]=textFielid.getText();
+            }
 
             int i=1;
             for (JTextField text:textFields){
@@ -296,13 +308,23 @@ public class tablasrefactorizado {
     private static void insertar(String[] columns, Connection conn, String[] fieldValues, int[] types) {
         StringBuilder sql = new StringBuilder("INSERT INTO " + tableName + " (");
         StringBuilder values = new StringBuilder(" VALUES (");
-
-        for (int i = 1; i < columns.length; i++) {
-            sql.append(columns[i]);
-            values.append("?");
-            if (i < columns.length - 1) {
-                sql.append(", ");
-                values.append(", ");
+        if (notAutiIncrement()){
+            for (int i = 0; i < columns.length; i++) {
+                sql.append(columns[i]);
+                values.append("?");
+                if (i < columns.length - 1) {
+                    sql.append(", ");
+                    values.append(", ");
+                }
+            }
+        }else {
+            for (int i = 1; i < columns.length; i++) {
+                sql.append(columns[i]);
+                values.append("?");
+                if (i < columns.length - 1) {
+                    sql.append(", ");
+                    values.append(", ");
+                }
             }
         }
         sql.append(") ");
@@ -315,22 +337,27 @@ public class tablasrefactorizado {
             pstmt = conn.prepareStatement(sql.toString());
 
             //System.out.println(Arrays.toString(types));
+            int paramIndex = 1;
+            if (notAutiIncrement()) {
+                pstmt.setObject(paramIndex++, fieldValues[0]);
+            }
             for (int i = 1; i < fieldValues.length; i++) {
-                if (types[i] == 12) {
-                    pstmt.setString(i, fieldValues[i]);
-                }
-                if (types[i] == 7) {
-                    pstmt.setFloat(i, Float.parseFloat(fieldValues[i]));
-                }
-                if (types[i] == 4) {
-                    pstmt.setInt(i, Integer.parseInt(fieldValues[i]));
-                }
-                if (types[i] == 2) {
-                    pstmt.setDouble(i, Double.parseDouble(fieldValues[i]));
-                }
-                if (types[i] == 91) {
-                    pstmt.setDate(i, Date.valueOf(fieldValues[i]));
-                }
+                pstmt.setObject(paramIndex++, fieldValues[i]);
+//                if (types[i] == 12) {
+//                    pstmt.setString(i, fieldValues[i]);
+//                }
+//                if (types[i] == 7) {
+//                    pstmt.setFloat(i, Float.parseFloat(fieldValues[i]));
+//                }
+//                if (types[i] == 4) {
+//                    pstmt.setInt(i, Integer.parseInt(fieldValues[i]));
+//                }
+//                if (types[i] == 2) {
+//                    pstmt.setDouble(i, Double.parseDouble(fieldValues[i]));
+//                }
+//                if (types[i] == 91) {
+//                    pstmt.setDate(i, Date.valueOf(fieldValues[i]));
+//                }
             }
 
             int rowsInserted = pstmt.executeUpdate();
@@ -512,7 +539,9 @@ public class tablasrefactorizado {
                     for (JTextField text:textFields){
                         if (!Objects.equals(text.getText(), "")){
                             //System.out.println(text.getText());
-                            actualizar(i, text.getText(), Integer.parseInt(textFieldid.getText()));
+                            //actualizar(i, text.getText(), Integer.parseInt(textFieldid.getText()));
+                            actualizar(i, text.getText(), textFieldid.getText());
+
                         }
                         i++;
                     }
@@ -531,7 +560,7 @@ public class tablasrefactorizado {
 
     }
 
-    private static void actualizar(int selection, String newValue, int id) {
+    private static void actualizar(int selection, String newValue, Object id) {
         PreparedStatement pstmt = null;
         Connection conn = null;
 
@@ -539,24 +568,27 @@ public class tablasrefactorizado {
             conn = connect();
             String sql = "UPDATE " + tableName + " SET " + headers[selection] + " = ? WHERE " + headers[0] + " = ?";
             pstmt = conn.prepareStatement(sql);
+//            System.out.println(Arrays.toString(columnTypes));
+//            System.out.println(Arrays.toString(headers));
+            pstmt.setObject(1, newValue);
 
-            if (columnTypes[selection] == 12) {
-                pstmt.setString(1, newValue);
-            }
-            if (columnTypes[selection] == 4) {
-                pstmt.setInt(1, Integer.parseInt(newValue));
-            }
-            if (columnTypes[selection] == 2) {
-                pstmt.setDouble(1, Double.parseDouble(newValue));
-            }
-            if (columnTypes[selection] == 91) {
-                pstmt.setDate(1, Date.valueOf(newValue));
-            }
-            if (columnTypes[selection] == 7) {
-                pstmt.setFloat(1, Float.parseFloat(newValue));
-            }
+//            if (columnTypes[selection] == 12) {
+//                pstmt.setString(1, newValue);
+//            }
+//            if (columnTypes[selection] == 4) {
+//                pstmt.setInt(1, Integer.parseInt(newValue));
+//            }
+//            if (columnTypes[selection] == 2) {
+//                pstmt.setDouble(1, Double.parseDouble(newValue));
+//            }
+//            if (columnTypes[selection] == 91) {
+//                pstmt.setDate(1, Date.valueOf(newValue));
+//            }
+//            if (columnTypes[selection] == 7) {
+//                pstmt.setFloat(1, Float.parseFloat(newValue));
+//            }
 
-            pstmt.setInt(2, id);
+            pstmt.setObject(2, id);
             int rowsUpdated = pstmt.executeUpdate();
             if (rowsUpdated > 0) {
                 System.out.println(entityName + " actualizado exitosamente.");
@@ -669,5 +701,33 @@ public class tablasrefactorizado {
             }
         }
         return types;
+    }
+    public static boolean notAutiIncrement(){
+        Statement stmt = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        try {
+            conn = tablasrefactorizado.connect();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT name FROM sqlite_sequence");
+            while (rs.next()) {
+                String Name = rs.getString("name");
+                if(Objects.equals(tableName, Name)){
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return true;
+        } finally {
+            try {
+                if (conn != null) tablasrefactorizado.disconnect(conn);
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+        return true;
     }
 }
