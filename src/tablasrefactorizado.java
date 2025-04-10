@@ -105,6 +105,7 @@ public class tablasrefactorizado {
                 frameSubMenu.remove(panelconsulta);
                 frameSubMenu.remove(panelSubmenu);
                 frameSubMenu.setTitle("Menu");
+                main.panelBox.setVisible(true);
                 main.panelMenu.setVisible(true);
                 frameSubMenu.revalidate();
                 frameSubMenu.repaint();
@@ -596,9 +597,11 @@ public class tablasrefactorizado {
             if (rowsUpdated > 0) {
                 System.out.println(entityName + " actualizado exitosamente.");
             } else {
+                errorMessage("No se encontró el ID proporcionado");
                 System.out.println("No se encontró el " + entityName + " con el ID proporcionado.");
             }
         } catch (Exception e) {
+            errorMessage("Error al actualizar");
             System.out.println("Error al actualizar el " + entityName + ": " + e.getMessage());
         } finally {
             disconnect(conn);
