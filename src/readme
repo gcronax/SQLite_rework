@@ -1,0 +1,5 @@
+Este programa funciona gestionando varias basese de datos,
+si quieres añadir tu base de datos haz de añadirla en la carpeta del proyecto SQLite_rework/tubasededatos.db
+y añadir el nombre ezacto de tu base de datos en el array de la linea 27 de la clase main
+
+linea 27        String[] opciones = {"DaviTeca", "gestion", "materiales_swing", "mimahair", "ordenadores", "skateshop","AgenciaViajesBaseDatos"};

@@ -1,15 +1,8 @@
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.JTableHeader;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class main {
@@ -23,28 +16,32 @@ public class main {
         Toolkit mipantalla= Toolkit.getDefaultToolkit();
         Dimension dimension = mipantalla.getScreenSize();
         tablasrefactorizado.frameSubMenu.setLocation(dimension.width/4, dimension.height/4);
+
         tablasrefactorizado.BDS="DaviTeca";
-        llamamiento();
+        generarCabecera();
+
 
 
         JLabel textBox= new JLabel();
         textBox.setText("Selecciona que base de datos quieres administrar");
-        String[] opciones = {"DaviTeca", "gestion", "materiales_swing", "mimahair", "ordenadores", "skateshop"};
+        String[] opciones = {"DaviTeca", "gestion", "materiales_swing", "mimahair", "ordenadores", "skateshop","AgenciaViajesBaseDatos"};
         JComboBox<String> cmbTipo = new JComboBox<>(opciones);
         cmbTipo.addActionListener(e -> {
             tablasrefactorizado.BDS= (String) cmbTipo.getSelectedItem();
-            llamamiento();
+            generarCabecera();
             tablasrefactorizado.frameSubMenu.revalidate();
             tablasrefactorizado.frameSubMenu.repaint();
         });
-        panelBox.setLayout(new BoxLayout(panelBox, BoxLayout.Y_AXIS));
 
 
-       panelBox.add(textBox);
         cmbTipo.setMaximumSize(new Dimension(300,30));
 
-        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel centerPanel = new JPanel(new GridBagLayout());
+        panelBox.add(textBox);
+
         centerPanel.add(cmbTipo);
+        centerPanel.setSize(new Dimension(40,40));
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         panelBox.add(centerPanel, BorderLayout.CENTER);
 
 
@@ -52,20 +49,24 @@ public class main {
 
         tablasrefactorizado.frameSubMenu.setLayout(new BorderLayout());
         tablasrefactorizado.frameSubMenu.add(panelBox, BorderLayout.CENTER);
-        tablasrefactorizado.frameSubMenu.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
+        tablasrefactorizado.frameSubMenu.revalidate();
+        tablasrefactorizado.frameSubMenu.repaint();
+
+        tablasrefactorizado.frameSubMenu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        tablasrefactorizado.frameSubMenu.setResizable(false);
         tablasrefactorizado.frameSubMenu.setVisible(true);
 
 
 
     }
 
-    private static void llamamiento() {
+    private static void generarCabecera() {
         tablasrefactorizado.frameSubMenu.remove(panelMenu);
         panelMenu=new JPanel();
         Statement stmt = null;
         ResultSet rs = null;
         Connection conn = null;
-        ArrayList<String> nombres = new ArrayList<>();
         panelMenu.setLayout(new GridLayout(1, 1));
 
         try {
