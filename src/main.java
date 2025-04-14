@@ -18,8 +18,56 @@ public class main {
         tablasrefactorizado.frameSubMenu.setLocation(dimension.width/4, dimension.height/4);
 
         tablasrefactorizado.BDS="DaviTeca";
-        generarCabecera();
 
+        panelMenu=new JPanel();
+        Statement stmt = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        panelMenu.setLayout(new GridLayout(1, 1));
+
+        try {
+            conn = tablasrefactorizado.connect();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name");
+            while (rs.next()) {
+                String tableName = rs.getString("name");
+                if (!Objects.equals(tableName, "sqlite_sequence")){
+                    //System.out.println(tableName);
+                    //nombres.add(tableName);
+                    JButton btnruedas = new JButton(tableName);
+                    btnruedas.addActionListener(e -> {
+                        tablasrefactorizado.menuTablas(tableName,tableName);
+                        panelMenu.setVisible(false);
+                        panelBox.setVisible(false);
+                        tablasrefactorizado.frameSubMenu.revalidate();
+                        tablasrefactorizado.frameSubMenu.repaint();
+                    });
+                    btnruedas.setFont(new Font("Arial", Font.BOLD, 18));
+                    btnruedas.setBackground(Color.lightGray);
+                    panelMenu.add(btnruedas);
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) tablasrefactorizado.disconnect(conn);
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+
+        JButton btnsalir = new JButton("salir");
+        btnsalir.addActionListener(e -> {
+            tablasrefactorizado.frameSubMenu.dispose();
+
+        });
+        btnsalir.setFont(new Font("Arial", Font.BOLD, 18));
+        btnsalir.setBackground(Color.lightGray);
+        panelMenu.add(btnsalir);
 
 
         JLabel textBox= new JLabel();
@@ -44,14 +92,9 @@ public class main {
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         panelBox.add(centerPanel, BorderLayout.CENTER);
 
-
-
-
         tablasrefactorizado.frameSubMenu.setLayout(new BorderLayout());
+        tablasrefactorizado.frameSubMenu.add(panelMenu, BorderLayout.NORTH);
         tablasrefactorizado.frameSubMenu.add(panelBox, BorderLayout.CENTER);
-
-        tablasrefactorizado.frameSubMenu.revalidate();
-        tablasrefactorizado.frameSubMenu.repaint();
 
         tablasrefactorizado.frameSubMenu.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         tablasrefactorizado.frameSubMenu.setResizable(false);
